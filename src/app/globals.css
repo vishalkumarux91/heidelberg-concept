@@ -1,0 +1,223 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Mycem concept — design tokens
+   Editorial-industrial. Warm paper, ink, hairline rules.
+   Accent is iron oxide: the pigment that is literally in the
+   material. Seasonal tints drive the hero only.
+   ============================================================ */
+
+@theme {
+  --color-paper: #f2efe8;
+  --color-paper-deep: #e7e2d7;
+  --color-paper-sunk: #dbd5c8;
+  --color-ink: #14120f;
+  --color-ink-soft: #3a352d;
+  /* Both muted tones clear 4.5:1 against paper AND paper-deep at 11px.
+     Small type is where this palette wants to drift too light — it can't. */
+  --color-ink-muted: #565045;
+  --color-ink-faint: #696254;
+  --color-rule: #cbc4b4;
+  --color-rule-strong: #a9a190;
+  --color-oxide: #a8412a;
+  --color-oxide-deep: #7d2e1d;
+  /* Oxide is too dark to sit on the ink-backed sections; this is its
+     counterpart for dark surfaces. */
+  --color-oxide-light: #dd7757;
+
+  --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-archivo), "Helvetica Neue", Helvetica, sans-serif;
+
+  /* Sized so both hero lines set on one line each at desktop, and the
+     whole stage (headline + subhead + caption + ticks) still fits 100dvh. */
+  --text-mega: clamp(2.5rem, 5.6vw, 5.25rem);
+  --text-display: clamp(2.5rem, 6.2vw, 5.5rem);
+  --text-title: clamp(1.9rem, 3.6vw, 3.1rem);
+}
+
+:root {
+  /* Seasonal tints — hero only. Each is the stressor, not the product.
+     Two ramps per season: the saturated one tints artwork and marker bars
+     (non-text, so contrast rules don't bite), the -text one is the same hue
+     darkened far enough to carry 11px labels on paper at 4.5:1. */
+  --season-summer: #c2551f;
+  --season-monsoon: #2f4f52;
+  --season-desert: #8a6b3a;
+  --season-winter: #5b7286;
+
+  --season-summer-text: #9e4315;
+  --season-monsoon-text: #2f4f52;
+  --season-desert-text: #6f5427;
+  --season-winter-text: #47596b;
+
+  --shell: 92rem;
+  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+}
+
+* {
+  border-color: var(--color-rule);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-synthesis-weight: none;
+  text-rendering: optimizeLegibility;
+}
+
+/* Concrete grain. Fixed so it reads as paper stock, not a moving texture. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.26;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background-color: var(--color-oxide);
+  color: var(--color-paper);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-oxide);
+  outline-offset: 3px;
+  border-radius: 1px;
+}
+
+/* ---------- Layout primitives ---------- */
+
+@utility shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Editorial two-column: section label sits in the left margin. */
+@utility editorial {
+  display: grid;
+  gap: 1.75rem 3rem;
+  grid-template-columns: 1fr;
+
+  @media (width >= 64rem) {
+    grid-template-columns: 12rem minmax(0, 1fr);
+    gap: 0 4rem;
+  }
+}
+
+/* ---------- Type ---------- */
+
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.018em;
+  text-wrap: balance;
+}
+
+@utility label-tag {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility prose-body {
+  font-size: clamp(1.0625rem, 1.35vw, 1.25rem);
+  line-height: 1.62;
+  letter-spacing: -0.005em;
+  color: var(--color-ink-soft);
+  text-wrap: pretty;
+}
+
+@utility numerals {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/* ---------- Motion ---------- */
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 1.25rem, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility rise-in {
+  animation: rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Scroll-linked reveal. Progressive enhancement: browsers without
+   animation-timeline simply show the content, no JS required. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise linear both;
+      animation-timeline: view();
+      animation-range: entry 5% cover 22%;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------- Placeholder art slots ----------
+   The client is supplying photography. These are deliberately
+   unglamorous: correct aspect ratio, labelled, and impossible to
+   mistake for finished art in a review. */
+
+@utility art-slot {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-paper-sunk);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 11px,
+    color-mix(in oklab, var(--color-rule-strong) 34%, transparent) 11px 12px
+  );
+  border: 1px solid var(--color-rule-strong);
+}
+
+/* ---------- Open-items annotation mode ----------
+   Off by default. Toggled from the review bar so the client can see
+   every unresolved slot in place rather than in a separate list. */
+
+[data-annotations="off"] .open-item {
+  display: none;
+}
+
+[data-annotations="on"] .open-item-anchor {
+  outline: 1px dashed var(--color-oxide);
+  outline-offset: 5px;
+  border-radius: 2px;
+}
