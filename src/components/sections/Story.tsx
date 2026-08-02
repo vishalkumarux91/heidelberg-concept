@@ -1,18 +1,18 @@
 import { story } from "@/content/copy";
 import { SectionLabel } from "@/components/ui/SectionHead";
-import { MissingFigure, OpenSlot } from "@/components/ui/OpenSlot";
+import { CountUp } from "@/components/ui/CountUp";
 
 /**
- * Section 03 — heritage as proof, not as headline.
+ * Section 03 — heritage as proof, not as headline. Sandy Grey.
  *
- * Measured register throughout: this is where institutional and technical
- * readers land, and where overclaiming does the most damage. The stat band
- * shows the two figures the client still owes as visible gaps rather than
- * quietly dropping the rows.
+ * The stat band counts up on reveal; the dealer and homes figures are
+ * illustrative concept numbers (see copy.ts) pending confirmed data.
+ * Proof points carry imagery cropped from the hero masters so the
+ * section stays in the same visual world.
  */
 export function Story() {
   return (
-    <section id="who" aria-labelledby="story-heading" className="border-t border-rule">
+    <section id="who" aria-labelledby="story-heading" className="bg-paper-deep">
       <div className="shell py-24 md:py-36">
         <div className="editorial">
           <SectionLabel index="03">{story.label}</SectionLabel>
@@ -23,8 +23,8 @@ export function Story() {
               className="display reveal max-w-[20ch] text-[length:var(--text-display)]"
             >
               {story.headline.map((line, i) => (
-                <span key={line} className="block">
-                  {i === 1 ? <span className="italic text-oxide">{line}</span> : line}
+                <span key={line} className={`block ${i === 1 ? "text-ink-muted" : ""}`}>
+                  {line}
                 </span>
               ))}
             </h2>
@@ -56,22 +56,31 @@ export function Story() {
 function StatBand() {
   return (
     <div className="mt-20">
-      <ul className="grid gap-px border-y border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-px overflow-hidden rounded-[var(--radius-md)] border border-rule bg-rule sm:grid-cols-2 lg:grid-cols-3">
         {story.stats.map((stat) => (
           <li
             key={stat.label}
-            className="reveal open-item-anchor flex flex-col justify-between bg-paper px-6 py-8"
+            className="reveal group relative isolate flex flex-col justify-between bg-paper px-6 py-8"
           >
+            {/* `isolate` + the wash's negative z-index keep it above the
+                card's own background but behind the figures. */}
+            <span aria-hidden="true" className="stat-wash opacity-0 group-hover:opacity-100" />
+
             <div>
-              <p className="display numerals text-5xl leading-none md:text-6xl">
-                {stat.figure ?? <MissingFigure label={stat.label} />}
+              <p className="display numerals text-5xl leading-none text-ink transition-colors duration-500 ease-[cubic-bezier(0.33,1,0.68,1)] group-hover:text-ink-deep md:text-6xl">
+                <CountUp
+                  value={stat.value}
+                  decimals={stat.decimals}
+                  prefix={stat.prefix}
+                  suffix={stat.suffix}
+                  plain={stat.plain}
+                />
               </p>
               <p className="mt-4 max-w-[24ch] text-[0.9375rem] leading-snug text-ink-soft">
                 {stat.label}
               </p>
             </div>
             <p className="label-tag mt-6 text-ink-faint">{stat.status}</p>
-            {stat.open ? <OpenSlot item={stat.open} /> : null}
           </li>
         ))}
       </ul>
@@ -88,7 +97,7 @@ function Sustainability() {
     <div className="mt-24 border-t-2 border-ink pt-12">
       <h3 className="display text-[length:var(--text-title)]">
         <span className="text-ink-muted">Grey material. </span>
-        <span className="italic text-oxide">Green intent.</span>
+        <span className="text-ink">Green intent.</span>
       </h3>
 
       <div className="mt-10 grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-16">
@@ -108,27 +117,28 @@ function Sustainability() {
 
           <ul className="divide-y divide-rule">
             {s.awarded.map((award) => (
-              <li key={award.title} className="reveal py-5">
-                <p className="text-[0.9375rem] font-medium leading-snug text-ink">{award.title}</p>
-                <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{award.detail}</p>
+              <li key={award.title}>
+                <div className="reveal group -mx-3 flex items-center gap-5 rounded-[var(--radius-sm)] px-3 py-5 transition-colors duration-200 hover:bg-paper">
+                  <div className="h-16 w-16 shrink-0 overflow-hidden rounded-[var(--radius-sm)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={award.image}
+                      alt={award.imageAlt}
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    />
+                  </div>
+                  <div>
+                    <p className="text-[0.9375rem] font-medium leading-snug text-ink">
+                      {award.title}
+                    </p>
+                    <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{award.detail}</p>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
-
-          {/* Three quantified claims are withheld rather than estimated.
-              Shown as named gaps so the omission is a decision, not an oversight. */}
-          <div className="open-item-anchor mt-8 border border-dashed border-rule-strong bg-paper-deep/60 p-5">
-            <p className="label-tag text-ink-muted">Held back pending data</p>
-            <ul className="mt-4 space-y-2.5">
-              {s.pending.map((item) => (
-                <li key={item.label} className="flex items-start gap-3 text-sm text-ink-soft">
-                  <span aria-hidden="true" className="mt-2 h-px w-3 shrink-0 bg-rule-strong" />
-                  <span>{item.label}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-5 text-xs leading-relaxed text-ink-faint">{s.pendingNote}</p>
-          </div>
         </div>
       </div>
     </div>

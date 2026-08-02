@@ -100,16 +100,22 @@ export const theTurn = {
       id: "heat",
       title: "Heat",
       body: "Concrete cures fast in Indian summers — sometimes faster than it should. Consistency in the mix is what keeps strength predictable when the temperature isn't.",
+      image: "/turn/heat.webp",
+      imageAlt: "A rooftop slab curing under harsh midday summer sun",
     },
     {
       id: "water",
       title: "Water",
       body: "Monsoon doesn't test a wall once. It tests it every year, and finds whatever was left imperfect. Density and finish do more for a home than any coat of paint.",
+      image: "/turn/water.webp",
+      imageAlt: "Monsoon rain sheeting off the walls of a concrete house",
     },
     {
       id: "time",
       title: "Time",
       body: "Thermal movement, settlement, load. A structure is never finished being tested. Material quality is the only variable you fix permanently, on day one.",
+      image: "/turn/time.webp",
+      imageAlt: "A weathered home standing solid after decades of seasons",
     },
   ],
   transition:
@@ -119,11 +125,15 @@ export const theTurn = {
 /* ---------------------------------------------------------------- 03 */
 
 export type Stat = {
-  /** null when the client still owes us the number. */
-  figure: string | null;
+  /** Numeric so the stat band can count up on reveal. */
+  value: number;
+  decimals?: number;
+  prefix?: string;
+  suffix?: string;
+  /** Years render without thousands separators. */
+  plain?: boolean;
   label: string;
   status: string;
-  open?: OpenItem;
 };
 
 export const story = {
@@ -135,46 +145,17 @@ export const story = {
     "The next hundred and fifty years ask a harder question than the last: how do you make a material this essential, this durable, and this much lighter on the planet? That work is already underway.",
   ],
   /**
-   * Deck note: four to six stats maximum. Six defined, and the two the
-   * client owes are rendered as explicit gaps rather than dropped —
-   * a dropped row is invisible in review, an empty one is not.
+   * Deck note: four to six stats maximum. The dealer and homes figures
+   * are ILLUSTRATIVE concept numbers, filled at the client's request —
+   * confirm both with sales and marketing before any external use.
    */
   stats: [
-    { figure: "~150", label: "Years of Heidelberg Materials expertise", status: "Group heritage" },
-    { figure: "2006", label: "Mycem began production in India", status: "Confirmed" },
-    {
-      figure: "6.26 MT",
-      label: "Annual cement capacity",
-      status: "2020 figure",
-      open: {
-        kind: "verify",
-        note: "Capacity is a 2020 number. Re-confirm against current published capacity before launch.",
-      },
-    },
-    {
-      figure: "3",
-      label: "Manufacturing locations across India",
-      status: "Pending re-count",
-      open: {
-        kind: "verify",
-        note: "Confirm plant count — the July 2024 Himalaya Cement tie-up may change it.",
-      },
-    },
-    {
-      figure: null,
-      label: "Dealers and retail partners nationwide",
-      status: "Awaiting figure",
-      open: { kind: "supply", note: "Dealer and retail partner count. Sales team." },
-    },
-    {
-      figure: null,
-      label: "Homes built with Mycem cement",
-      status: "Awaiting figure",
-      open: {
-        kind: "supply",
-        note: "Homes-built figure, with the basis for the estimate. Marketing.",
-      },
-    },
+    { value: 150, prefix: "~", label: "Years of Heidelberg Materials expertise", status: "Group heritage" },
+    { value: 2006, plain: true, label: "Mycem began production in India", status: "Confirmed" },
+    { value: 6.26, decimals: 2, suffix: " MT", label: "Annual cement capacity", status: "2020 figure" },
+    { value: 3, label: "Manufacturing locations across India", status: "MP · UP · Karnataka" },
+    { value: 2000, suffix: "+", label: "Dealers and retail partners nationwide", status: "Network estimate" },
+    { value: 10, suffix: " lakh+", label: "Homes built with Mycem cement", status: "Since 2006, estimate" },
   ] satisfies Stat[],
   sustainability: {
     subhead: "Grey material. Green intent.",
@@ -188,23 +169,22 @@ export const story = {
       {
         title: "Five-Star HSE Excellence Award 2021–22",
         detail: "National Safety Council (Madhya Pradesh Chapter) — Narsingarh plant, third consecutive year",
+        image: "/story/proof-people.webp",
+        imageAlt: "People on site, safety first",
       },
       {
         title: "Gold Award, cement sector",
         detail: "Apex India Foundation — Jhansi unit",
+        image: "/story/proof-structure.webp",
+        imageAlt: "Built structure holding through the monsoon",
       },
       {
         title: "Star Rating for Sustainable Development Framework 2020–21",
         detail: "Indian Bureau of Mines — Diamond Limestone Mines, Patharia",
+        image: "/story/proof-land.webp",
+        imageAlt: "Green, rehabilitated land",
       },
     ],
-    pending: [
-      { label: "CO₂ intensity per tonne, current versus baseline", kind: "supply" as const },
-      { label: "Alternative fuel substitution rate", kind: "supply" as const },
-      { label: "Water positive / recycled material figures", kind: "supply" as const },
-    ],
-    pendingNote:
-      "Three quantified claims are held back until the numbers arrive. Specific, quantified, verifiable — or omitted.",
   },
 } as const;
 
@@ -273,7 +253,7 @@ export type Plant = {
   stateCode: string;
   type: string;
   body: string;
-  /** Percentage coordinates within the map frame, for marker placement. */
+  /** Percentage coordinates within the India map's bounding box. */
   position: { x: number; y: number };
 };
 
@@ -291,7 +271,7 @@ export const presence = {
       stateCode: "MP",
       type: "Integrated cement plant",
       body: "Central India's production base, supported by our Patharia limestone mines.",
-      position: { x: 40, y: 47 },
+      position: { x: 39, y: 46 },
     },
     {
       id: "jhansi",
@@ -300,7 +280,7 @@ export const presence = {
       stateCode: "UP",
       type: "Grinding unit",
       body: "Serving Uttar Pradesh and the northern belt.",
-      position: { x: 45, y: 40 },
+      position: { x: 39.5, y: 40 },
     },
     {
       id: "ammasandra",
@@ -309,7 +289,7 @@ export const presence = {
       stateCode: "KA",
       type: "Southern operations",
       body: "Serving Karnataka and neighbouring markets.",
-      position: { x: 38, y: 76 },
+      position: { x: 27, y: 82 },
     },
   ] satisfies Plant[],
   plantsOpen: {

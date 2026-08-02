@@ -1,17 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Archivo, Instrument_Serif } from "next/font/google";
+import { JetBrains_Mono, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { SmoothScroll } from "@/components/SmoothScroll";
 
-const archivo = Archivo({
-  variable: "--font-archivo",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
   display: "swap",
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f2efe8",
+  themeColor: "#004E2B",
 };
 
 export default function RootLayout({
@@ -39,10 +41,25 @@ export default function RootLayout({
   return (
     <html
       lang="en-IN"
-      data-annotations="off"
-      className={`${archivo.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${jakarta.variable} ${jetbrains.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-paper text-ink">{children}</body>
+      <head>
+        {/* First hero frame only — the other three lazy-load, or they
+            compete for bandwidth at first paint. */}
+        <link
+          rel="preload"
+          as="image"
+          href="/hero/summer-2560.avif"
+          type="image/avif"
+          imageSrcSet="/hero/summer-1080.avif 1080w, /hero/summer-1600.avif 1600w, /hero/summer-2560.avif 2560w, /hero/summer-3840.avif 3840w"
+          imageSizes="100vw"
+          fetchPriority="high"
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-paper text-ink-deep">
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

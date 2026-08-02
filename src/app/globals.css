@@ -2,56 +2,67 @@
 
 /* ============================================================
    Mycem concept — design tokens
-   Editorial-industrial. Warm paper, ink, hairline rules.
-   Accent is iron oxide: the pigment that is literally in the
-   material. Seasonal tints drive the hero only.
+   Heidelberg Materials brand system. Deep Green + Sandy Grey
+   core (exact, from the guide), derived ramps for UI depth,
+   JetBrains Mono as the engineering utility face.
+   See DESIGN_INSTRUCTIONS: boldness is spent on the hero;
+   everything after it stays quiet and precise.
    ============================================================ */
 
 @theme {
-  --color-paper: #f2efe8;
-  --color-paper-deep: #e7e2d7;
-  --color-paper-sunk: #dbd5c8;
-  --color-ink: #14120f;
-  --color-ink-soft: #3a352d;
-  /* Both muted tones clear 4.5:1 against paper AND paper-deep at 11px.
-     Small type is where this palette wants to drift too light — it can't. */
-  --color-ink-muted: #565045;
-  --color-ink-faint: #696254;
-  --color-rule: #cbc4b4;
-  --color-rule-strong: #a9a190;
-  --color-oxide: #a8412a;
-  --color-oxide-deep: #7d2e1d;
-  /* Oxide is too dark to sit on the ink-backed sections; this is its
-     counterpart for dark surfaces. */
-  --color-oxide-light: #dd7757;
+  /* Surfaces. `paper` is the light ground, `paper-deep` is brand
+     Sandy Grey (exact), `paper-sunk` the darker sand for wells. */
+  --color-paper: #ffffff;
+  --color-paper-deep: #e6e6df; /* brand Sandy Grey — do not alter */
+  --color-paper-sunk: #f3f3ef;
+  --color-sand-300: #cfcfc9;
 
-  --font-display: var(--font-instrument-serif), "Iowan Old Style", Georgia, serif;
-  --font-sans: var(--font-archivo), "Helvetica Neue", Helvetica, sans-serif;
+  /* Ink is brand Deep Green (exact). Text ramp derives from it. */
+  --color-ink: #004e2b; /* brand Deep Green — do not alter */
+  --color-ink-deep: #002f1a;
+  --color-ink-soft: #29503c;
+  --color-ink-muted: #47695a;
+  --color-ink-faint: #5e7a6c;
 
-  /* Sized so both hero lines set on one line each at desktop, and the
-     whole stage (headline + subhead + caption + ticks) still fits 100dvh. */
-  --text-mega: clamp(2.5rem, 5.6vw, 5.25rem);
-  --text-display: clamp(2.5rem, 6.2vw, 5.5rem);
-  --text-title: clamp(1.9rem, 3.6vw, 3.1rem);
+  --color-rule: #d9ddd5;
+  --color-rule-strong: #99b8aa;
+
+  /* Accent — PROVISIONAL hex, confined to chips, markers, focus and
+     small highlights so a later swap is cheap. Fails AA on white for
+     text: never body copy. `oxide` name kept so existing utilities
+     keep working; value is now the brand accent green. */
+  --color-oxide: #1e7a45;
+  --color-oxide-deep: #004e2b;
+  --color-oxide-light: #5cb947; /* the provisional accent itself */
+
+  --font-display: var(--font-jakarta), system-ui, sans-serif;
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --text-mega: clamp(3rem, 7vw, 6.5rem);
+  --text-display: clamp(2.25rem, 4.5vw, 4rem);
+  --text-title: clamp(1.5rem, 2.5vw, 2.25rem);
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
 }
 
 :root {
-  /* Seasonal tints — hero only. Each is the stressor, not the product.
-     Two ramps per season: the saturated one tints artwork and marker bars
-     (non-text, so contrast rules don't bite), the -text one is the same hue
-     darkened far enough to carry 11px labels on paper at 4.5:1. */
-  --season-summer: #c2551f;
-  --season-monsoon: #2f4f52;
-  --season-desert: #8a6b3a;
-  --season-winter: #5b7286;
+  /* Weather state colours — hero HUD only. Never on buttons,
+     headings, links or brand marks. */
+  --season-summer: #d99a2b;
+  --season-monsoon: #3c4e5c;
+  --season-desert: #c08a4a;
+  --season-winter: #8fa9be;
 
-  --season-summer-text: #9e4315;
-  --season-monsoon-text: #2f4f52;
-  --season-desert-text: #6f5427;
-  --season-winter-text: #47596b;
+  --season-summer-text: #8a5d10;
+  --season-monsoon-text: #3c4e5c;
+  --season-desert-text: #7d5626;
+  --season-winter-text: #4e6478;
 
-  --shell: 92rem;
-  --gutter: clamp(1.25rem, 4vw, 4.5rem);
+  --shell: 90rem;
+  --gutter: clamp(1.25rem, 4vw, 5rem);
 }
 
 * {
@@ -59,39 +70,26 @@
 }
 
 html {
-  scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
   background-color: var(--color-paper);
-  color: var(--color-ink);
+  color: var(--color-ink-deep);
   font-family: var(--font-sans);
   font-synthesis-weight: none;
   text-rendering: optimizeLegibility;
 }
 
-/* Concrete grain. Fixed so it reads as paper stock, not a moving texture. */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.26;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
-}
-
 ::selection {
-  background-color: var(--color-oxide);
+  background-color: var(--color-ink);
   color: var(--color-paper);
 }
 
 :focus-visible {
-  outline: 2px solid var(--color-oxide);
-  outline-offset: 3px;
-  border-radius: 1px;
+  outline: 2px solid var(--color-oxide-light);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 /* ---------- Layout primitives ---------- */
@@ -119,18 +117,20 @@ body::before {
 
 @utility display {
   font-family: var(--font-display);
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.018em;
+  font-weight: 800;
+  line-height: 1.04;
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
+/* Mono, uppercase, tracked out — eyebrows, section labels, stat
+   units, coordinates. The one engineering signal on the page. */
 @utility label-tag {
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-weight: 500;
   line-height: 1;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   font-variant-numeric: tabular-nums;
 }
@@ -148,7 +148,25 @@ body::before {
   font-feature-settings: "tnum" 1;
 }
 
-/* ---------- Motion ---------- */
+/* ---------- Motion ----------
+   Reveals are quiet: a 20px rise, once per element, staggered by
+   markup order. `.reveal` elements are hidden only after JS arrives
+   (html[data-motion="on"], set by SmoothScroll), so no-JS and
+   reduced-motion readers see everything immediately. */
+
+html[data-motion="on"] .reveal {
+  opacity: 0;
+  transform: translate3d(0, 1.25rem, 0);
+  transition:
+    opacity 0.6s cubic-bezier(0.33, 1, 0.68, 1),
+    transform 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+  transition-delay: calc(var(--reveal-i, 0) * 70ms);
+}
+
+html[data-motion="on"] .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
 
 @keyframes rise {
   from {
@@ -165,18 +183,6 @@ body::before {
   animation: rise 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Scroll-linked reveal. Progressive enhancement: browsers without
-   animation-timeline simply show the content, no JS required. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .reveal {
-      animation: rise linear both;
-      animation-timeline: view();
-      animation-range: entry 5% cover 22%;
-    }
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -191,33 +197,207 @@ body::before {
   }
 }
 
-/* ---------- Placeholder art slots ----------
-   The client is supplying photography. These are deliberately
-   unglamorous: correct aspect ratio, labelled, and impossible to
-   mistake for finished art in a review. */
+/* ---------- Hero ---------- */
+
+/* Grain overlay — the frames are illustrations; grain unifies them. */
+.hero-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
+}
+
+/* Type scrim.
+   The supplied frames are bright, saturated illustrations — a purely
+   bottom-weighted scrim leaves white display type sitting on lit sky and
+   foliage, well under 4.5:1. Two stacked ramps instead: one from the left
+   protecting the type column, one from the bottom carrying the HUD. Both
+   fall off before the right third, so the house and valley stay untouched. */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Neutral black, never a green tint: the winter frame is near-white
+     snow, and a tinted scrim turns it muddy.
+
+     Deliberately light so the artwork and weather effects stay the show —
+     the headline leans on hero-text-shadow for the rest of its
+     separation. Large display type needs 3:1, and the worst frame
+     (winter) sits just above that; smaller lines live low in the frame
+     where the bottom ramp stacks on top. */
+  background-image:
+    linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.52) 0%,
+      rgba(0, 0, 0, 0.44) 44%,
+      rgba(0, 0, 0, 0.2) 62%,
+      transparent 78%
+    ),
+    linear-gradient(to top, rgba(0, 0, 0, 0.46) 0%, rgba(0, 0, 0, 0.14) 28%, transparent 52%),
+    linear-gradient(rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.1));
+}
+
+/* Soft halo that buys legibility back where the scrim eased off. */
+@utility hero-text-shadow {
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.45),
+    0 4px 28px rgba(0, 0, 0, 0.5);
+}
+
+/* Mobile frames are shorter and the type sits at the foot, so the vertical
+   ramp does the work there. */
+.hero-scrim-mobile {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to top, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.3) 34%, transparent 62%),
+    linear-gradient(rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0.08));
+}
+
+/* Painted-cloud bands that drift over transitions. */
+.hero-cloud {
+  position: absolute;
+  left: -50%;
+  top: 0;
+  width: 200%;
+  height: 58%;
+  pointer-events: none;
+  opacity: 0;
+  background-repeat: repeat-x;
+  background-size: 1000px 100%;
+  -webkit-mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.72) 44%, transparent 76%);
+  mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.72) 44%, transparent 76%);
+}
+
+.hero-cloud-a {
+  background-image:
+    radial-gradient(closest-side at 16% 44%, rgba(255, 255, 255, 0.48), transparent),
+    radial-gradient(closest-side at 45% 28%, rgba(255, 255, 255, 0.38), transparent),
+    radial-gradient(closest-side at 76% 46%, rgba(255, 255, 255, 0.44), transparent);
+}
+
+.hero-cloud-b {
+  background-image:
+    radial-gradient(closest-side at 28% 34%, rgba(176, 188, 200, 0.52), transparent),
+    radial-gradient(closest-side at 68% 24%, rgba(156, 170, 186, 0.46), transparent);
+  background-size: 1450px 100%;
+}
+
+/* Placeholder scenery per season, shown behind the real frame so a
+   missing asset degrades to art direction rather than a broken image. */
+.hero-fallback-summer {
+  background: linear-gradient(to bottom, #ecdfc2 0%, #e3c98f 46%, #b98d4e 74%, #7c5b31 100%);
+}
+.hero-fallback-monsoon {
+  background: linear-gradient(to bottom, #55636e 0%, #3c4e5c 48%, #2c4437 76%, #1c2f26 100%);
+}
+.hero-fallback-desert {
+  background: linear-gradient(to bottom, #e8cba0 0%, #d3a768 50%, #a8763c 78%, #6d4a24 100%);
+}
+.hero-fallback-winter {
+  background: linear-gradient(to bottom, #cfdce8 0%, #aebecd 48%, #8fa4b5 76%, #5c707f 100%);
+}
+
+/* ---------- Placeholder art slots ---------- */
 
 @utility art-slot {
   position: relative;
   overflow: hidden;
+  border-radius: var(--radius-sm);
   background-color: var(--color-paper-sunk);
   background-image: repeating-linear-gradient(
     -45deg,
     transparent 0 11px,
-    color-mix(in oklab, var(--color-rule-strong) 34%, transparent) 11px 12px
+    color-mix(in oklab, var(--color-rule-strong) 30%, transparent) 11px 12px
   );
   border: 1px solid var(--color-rule-strong);
 }
 
-/* ---------- Open-items annotation mode ----------
-   Off by default. Toggled from the review bar so the client can see
-   every unresolved slot in place rather than in a separate list. */
+/* ---------- Stat cards ---------- */
 
-[data-annotations="off"] .open-item {
-  display: none;
+/* Hover wash for the stat band.
+   A gradient can't be cross-faded as a `background-image`, so it sits on
+   its own layer behind the content and animates opacity instead — which
+   also lets it ease slowly on its own terms. Deliberately longer than the
+   150–200ms the design doc gives for hover: at that speed a wash this
+   faint reads as a snap rather than a response. Derived from Deep Green
+   via color-mix, so it follows the brand colour if that ever moves.
+
+   Note the resting `opacity: 0` deliberately lives on the element as a
+   Tailwind utility, NOT here: this rule is unlayered, and unlayered
+   declarations outrank anything in `@layer utilities` whatever the
+   specificity — so declaring opacity here would silently beat
+   `group-hover:opacity-100` and the wash would never appear. */
+.stat-wash {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transition: opacity 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  background-image:
+    radial-gradient(
+      115% 95% at 0% 0%,
+      color-mix(in srgb, var(--color-ink) 11%, transparent) 0%,
+      color-mix(in srgb, var(--color-ink) 4%, transparent) 45%,
+      transparent 74%
+    ),
+    linear-gradient(
+      color-mix(in srgb, var(--color-ink) 2.5%, transparent),
+      color-mix(in srgb, var(--color-ink) 2.5%, transparent)
+    );
 }
 
-[data-annotations="on"] .open-item-anchor {
-  outline: 1px dashed var(--color-oxide);
-  outline-offset: 5px;
-  border-radius: 2px;
+/* ---------- India map ---------- */
+
+.india-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.india-svg .india-state {
+  fill: rgba(255, 255, 255, 0.07);
+  stroke: rgba(255, 255, 255, 0.28);
+  stroke-width: 0.5;
+  transition:
+    fill 0.2s ease,
+    fill-opacity 0.2s ease;
+}
+
+.india-svg .india-state:hover {
+  fill: rgba(255, 255, 255, 0.14);
+}
+
+/* States that host plants: filled with their marker colour, clickable. */
+.india-svg .india-state-active {
+  fill: var(--state-fill, var(--color-oxide-light));
+  fill-opacity: 0.34;
+  cursor: pointer;
+}
+
+.india-svg .india-state-active:hover {
+  fill: var(--state-fill, var(--color-oxide-light));
+  fill-opacity: 0.55;
+}
+
+.india-svg .india-state-active.is-muted {
+  fill-opacity: 0.12;
+}
+
+@keyframes map-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
 }

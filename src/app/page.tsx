@@ -4,7 +4,6 @@ import { Story } from "@/components/sections/Story";
 import { Products } from "@/components/sections/Products";
 import { Presence } from "@/components/sections/Presence";
 import { LeadCapture } from "@/components/sections/LeadCapture";
-import { ReviewBar } from "@/components/ReviewBar";
 
 export default function Page() {
   return (
@@ -24,8 +23,6 @@ export default function Page() {
         <Presence />
         <LeadCapture />
       </main>
-
-      <ReviewBar />
     </>
   );
 }
