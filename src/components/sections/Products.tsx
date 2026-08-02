@@ -2,19 +2,22 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { products, type Product } from "@/content/copy";
-import { OpenSlot } from "@/components/ui/OpenSlot";
+import { SectionLabel } from "@/components/ui/SectionHead";
 
 /**
- * Section 04 — the range.
+ * Section 04 — the range. White, and that is mandated, not aesthetic:
+ * product bag imagery may only sit on white or pale backgrounds, never
+ * dark or photographic ones (brand guide, packed products). It also
+ * gives the page its breath of light between two Deep Green sections.
  *
- * Native scroll-snap does the work: touch, trackpad and keyboard all
- * scroll the region without JS. The arrow buttons are an enhancement on
- * top, and the region carries `tabIndex` so it stays reachable by keyboard
- * when it overflows.
+ * Native scroll-snap does the carousel work: touch, trackpad and
+ * keyboard all scroll the region without JS. Arrow buttons are an
+ * enhancement on top.
  *
- * Every card has an empty claim slot. Cement is BIS-standardised, so
- * "premium" means nothing without the attribute behind it — the slots stay
- * visibly empty until the technical team fills them.
+ * The bag renders are AI-generated placeholders for the concept — swap
+ * /public/products/bag-<id>.jpg for supplied, unmodified photography.
+ * Every card keeps an empty claim slot: cement is BIS-standardised, so
+ * "premium" means nothing without the attribute behind it.
  */
 export function Products() {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -56,33 +59,25 @@ export function Products() {
   }, []);
 
   return (
-    <section id="range" aria-labelledby="products-heading" className="border-t border-rule bg-ink text-paper">
+    <section id="range" aria-labelledby="products-heading" className="bg-paper">
       <div className="shell py-24 md:py-36">
         <div className="editorial">
-          <div className="label-tag flex items-baseline gap-3 text-paper/75 lg:sticky lg:top-16 lg:self-start">
-            <span className="numerals text-oxide-light">04</span>
-            <span className="h-px w-6 bg-paper/25 lg:hidden" aria-hidden="true" />
-            <span>{products.label}</span>
-          </div>
+          <SectionLabel index="04">{products.label}</SectionLabel>
 
           <div>
             <div className="flex flex-wrap items-end justify-between gap-8">
               <div>
                 <h2
                   id="products-heading"
-                  className="display max-w-[14ch] text-[length:var(--text-display)]"
+                  className="display reveal max-w-[14ch] text-[length:var(--text-display)] text-ink"
                 >
                   {products.headline}
                 </h2>
-                <p className="prose-body mt-7 max-w-[46ch] text-paper/80!">{products.subhead}</p>
+                <p className="prose-body reveal mt-7 max-w-[46ch]">{products.subhead}</p>
               </div>
 
               <div className="flex gap-2">
-                <ArrowButton
-                  direction="prev"
-                  disabled={bounds.start}
-                  onClick={() => nudge(-1)}
-                />
+                <ArrowButton direction="prev" disabled={bounds.start} onClick={() => nudge(-1)} />
                 <ArrowButton direction="next" disabled={bounds.end} onClick={() => nudge(1)} />
               </div>
             </div>
@@ -91,40 +86,35 @@ export function Products() {
       </div>
 
       {/* Breaks the shell deliberately: the range runs off the right edge to
-          signal there is more than fits.
-
-          The scroll region is a div wrapping the ul, not the ul itself —
-          role="region" on a <ul> overrides its implicit list role and orphans
-          every <li> from the accessibility tree.
-
-          scroll-px matters here too: without it the snapport starts at the
-          padding box and mandatory snapping yanks the first card flush to the
-          viewport edge, eating the gutter. */}
+          signal there is more than fits. The scroll region is a div wrapping
+          the ul — role="region" on a <ul> would orphan every <li> from the
+          accessibility tree. */}
       <div
         ref={scrollerRef}
         tabIndex={0}
         role="region"
+        aria-roledescription="carousel"
         aria-label="Mycem product range, scrollable"
         className="snap-x snap-mandatory overflow-x-auto scroll-px-[var(--gutter)] [scrollbar-width:thin]"
       >
-        <ul className="flex gap-6 px-[var(--gutter)] pb-24 md:pb-36">
+        <ul className="flex gap-6 px-[var(--gutter)] pb-24 md:pb-32">
           {products.items.map((product, i) => (
             <ProductCard key={product.id} product={product} index={i} />
           ))}
         </ul>
       </div>
 
-      <div className="shell border-t border-paper/15 py-10">
+      <div className="shell border-t border-rule py-10">
         <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
-          <p className="text-lg text-paper/80">{products.footer.question}</p>
+          <p className="text-lg text-ink-soft">{products.footer.question}</p>
           <a
             href="#enquiry"
-            className="group inline-flex items-center gap-3 text-lg text-paper underline decoration-oxide decoration-2 underline-offset-[6px] transition-colors hover:text-oxide-light"
+            className="group inline-flex min-h-11 items-center gap-3 text-lg font-semibold text-ink underline decoration-oxide-light decoration-2 underline-offset-[6px] transition-colors hover:text-oxide"
           >
             {products.footer.cta}
             <span
               aria-hidden="true"
-              className="transition-transform duration-300 group-hover:translate-x-1"
+              className="transition-transform duration-200 group-hover:translate-x-1"
             >
               →
             </span>
@@ -138,45 +128,59 @@ export function Products() {
 /* ------------------------------------------------------------------ */
 
 function ProductCard({ product, index }: { product: Product; index: number }) {
+  const [imgOk, setImgOk] = useState(true);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  // A pre-hydration load error never reaches onError; re-check on mount.
+  useEffect(() => {
+    const img = imgRef.current;
+    if (img && img.complete && img.naturalWidth === 0) setImgOk(false);
+  }, []);
+
   return (
     <li className="w-[80vw] max-w-[24rem] shrink-0 snap-start sm:w-[22rem]">
-      <article className="flex h-full flex-col border border-paper/20 bg-paper/[0.04]">
-        {/* Bag shot. Portrait, roughly the proportion of a 50kg sack. */}
-        <div className="art-slot aspect-[3/4] border-0 border-b border-paper/20 bg-paper/8 [background-image:repeating-linear-gradient(-45deg,transparent_0_11px,rgba(242,239,232,0.09)_11px_12px)]">
-          <div className="absolute inset-0 grid place-items-center p-6 text-center">
-            <div>
-              <p className="label-tag text-oxide-light">Bag shot to be supplied</p>
-              <p className="display mt-3 text-2xl text-paper">{product.name}</p>
+      <article className="group flex h-full flex-col overflow-hidden rounded-[var(--radius-md)] border border-rule bg-paper transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_50px_-18px_rgba(0,47,26,0.3)]">
+        {/* Bag on a pale ground — white or Sandy Grey only, unmodified. */}
+        <div className="relative aspect-[3/4] overflow-hidden border-b border-rule bg-paper-sunk">
+          {imgOk ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              ref={imgRef}
+              src={`/products/bag-${product.id}.jpg`}
+              alt={`${product.name} cement bag — placeholder render`}
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
+              onError={() => setImgOk(false)}
+            />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center p-6 text-center">
+              <div>
+                <p className="label-tag text-ink-muted">Bag shot to be supplied</p>
+                <p className="display mt-3 text-2xl text-ink">{product.name}</p>
+              </div>
             </div>
-          </div>
-          <span className="label-tag numerals absolute left-4 top-4 text-paper/70">
+          )}
+          <span className="label-tag numerals absolute left-4 top-4 rounded-full bg-white/85 px-2.5 py-1.5 text-ink-muted">
             {String(index + 1).padStart(2, "0")}
           </span>
         </div>
 
         <div className="flex flex-1 flex-col p-6">
-          <h3 className="display text-3xl text-paper">{product.name}</h3>
-          <p className="mt-2 text-base text-oxide-light">{product.role}</p>
-          <p className="mt-4 text-[0.9375rem] leading-relaxed text-paper/80">{product.body}</p>
+          <h3 className="display text-2xl text-ink">{product.name}</h3>
+          <p className="mt-2 text-base font-semibold text-ink-soft">{product.role}</p>
+          <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{product.body}</p>
 
-          <ul className="mt-6 flex flex-wrap gap-1.5">
+          <ul className="mt-auto flex flex-wrap gap-1.5 pt-6">
             {product.tags.map((tag) => (
               <li
                 key={tag}
-                className="label-tag border border-paper/30 px-2.5 py-1.5 text-paper/80"
+                className="label-tag rounded-full border border-rule-strong px-3 py-2 text-ink-soft transition-colors duration-200 group-hover:border-ink-muted"
               >
                 {tag}
               </li>
             ))}
           </ul>
-
-          <div className="open-item-anchor mt-auto pt-6">
-            <div className="border-t border-dashed border-paper/25 pt-4">
-              <p className="label-tag text-paper/70">Technical claim</p>
-              <p className="mt-2 text-sm text-paper/70">Awaiting attribute and test basis</p>
-              <OpenSlot item={product.claim} tone="dark" />
-            </div>
-          </div>
         </div>
       </article>
     </li>
@@ -198,7 +202,7 @@ function ArrowButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={direction === "prev" ? "Previous product" : "Next product"}
-      className="grid h-12 w-12 place-items-center border border-paper/40 text-paper transition-colors hover:border-oxide-light hover:bg-oxide-light hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-paper/40 disabled:hover:bg-transparent disabled:hover:text-paper"
+      className="grid h-12 w-12 cursor-pointer place-items-center rounded-full border border-rule-strong text-ink transition-colors duration-200 hover:border-ink hover:bg-ink hover:text-white disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:border-rule-strong disabled:hover:bg-transparent disabled:hover:text-ink"
     >
       <span aria-hidden="true" className="text-lg">
         {direction === "prev" ? "←" : "→"}

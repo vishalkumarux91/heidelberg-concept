@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# claude code local machine config (contains signed asset URLs)
+.claude/settings.local.json

@@ -2,20 +2,15 @@
 
 import { useMemo, useState } from "react";
 import { presence } from "@/content/copy";
-import { SectionLabel } from "@/components/ui/SectionHead";
-import { OpenSlot } from "@/components/ui/OpenSlot";
+import { IndiaMap, STATE_COLOR } from "@/components/ui/IndiaMap";
 
 const STATES = [...new Set(presence.plants.map((p) => p.state))];
 
 /**
- * Section 05 — presence.
- *
- * The selection mechanic, filtering and marker placement are all live.
- * What is missing is only the base map: an India outline has deliberately
- * not been drawn or approximated here, because an inaccurate national
- * boundary on an India-facing site is a legal and reputational exposure,
- * not a design detail. The frame below is the real coordinate space, so
- * dropping in a licensed, boundary-accurate asset needs no repositioning.
+ * Section 05 — presence. Deep Green, an interactive India map with plant
+ * markers colour-coded by state. Chips and state shapes both filter;
+ * clicking a marker opens a plant detail popup. The list mirrors the
+ * map for keyboard and screen-reader users.
  */
 export function Presence() {
   const [selected, setSelected] = useState<string | null>(null);
@@ -26,56 +21,85 @@ export function Presence() {
   );
 
   return (
-    <section id="where" aria-labelledby="presence-heading" className="border-t border-rule">
-      <div className="shell py-24 md:py-36">
+    <section id="where" aria-labelledby="presence-heading" className="bg-ink text-paper-deep">
+      <div className="shell py-24 md:py-40">
         <div className="editorial">
-          <SectionLabel index="05">{presence.label}</SectionLabel>
+          <div className="label-tag flex items-baseline gap-3 text-white/60 lg:sticky lg:top-16 lg:self-start">
+            <span className="numerals text-oxide-light">05</span>
+            <span className="h-px w-6 bg-white/25 lg:hidden" aria-hidden="true" />
+            <span>{presence.label}</span>
+          </div>
 
           <div>
             <h2
               id="presence-heading"
-              className="display reveal max-w-[16ch] text-[length:var(--text-display)]"
+              className="display reveal max-w-[16ch] text-[length:var(--text-display)] text-white"
             >
               {presence.headline.map((line, i) => (
-                <span key={line} className="block">
-                  {i === 1 ? <span className="italic text-oxide">{line}</span> : line}
+                <span key={line} className={`block ${i === 1 ? "text-paper-deep/70" : ""}`}>
+                  {line}
                 </span>
               ))}
             </h2>
 
-            <p className="prose-body reveal mt-10 max-w-[58ch]">{presence.body}</p>
+            <p className="prose-body reveal mt-10 max-w-[58ch] text-paper-deep/85!">
+              {presence.body}
+            </p>
 
-            <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1fr)] lg:gap-14">
-              <MapFrame selected={selected} onSelect={setSelected} />
+            <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1fr)] lg:gap-14">
+              <div>
+                <p className="label-tag text-white/60">{presence.mapPrompt}</p>
+
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  <FilterChip active={selected === null} onClick={() => setSelected(null)}>
+                    {presence.allLabel}
+                  </FilterChip>
+                  {STATES.map((state) => (
+                    <FilterChip
+                      key={state}
+                      active={selected === state}
+                      swatch={STATE_COLOR[state]}
+                      onClick={() => setSelected(selected === state ? null : state)}
+                    >
+                      {state}
+                    </FilterChip>
+                  ))}
+                </div>
+
+                <div className="mt-8">
+                  <IndiaMap selected={selected} onSelect={setSelected} />
+                </div>
+              </div>
 
               <div>
-                <div className="flex items-baseline justify-between gap-4 border-b border-rule pb-3">
-                  <h3 className="label-tag text-ink">
+                <div className="flex items-baseline justify-between gap-4 border-b border-white/20 pb-3">
+                  <h3 className="label-tag text-white" aria-live="polite">
                     {selected ?? presence.allLabel}
                   </h3>
-                  <p className="numerals text-xs text-ink-faint">
+                  <p className="numerals text-xs text-white/50">
                     {visible.length} {visible.length === 1 ? "location" : "locations"}
                   </p>
                 </div>
 
-                <ul className="divide-y divide-rule">
+                <ul className="divide-y divide-white/15">
                   {visible.map((plant) => (
-                    <li key={plant.id} className="py-6">
+                    <li key={plant.id} className="group py-6 transition-colors duration-200">
                       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                        <h4 className="display text-2xl">{plant.name}</h4>
-                        <span className="text-sm text-ink-muted">{plant.state}</span>
+                        <span
+                          aria-hidden="true"
+                          className="inline-block h-2.5 w-2.5 self-center rounded-full transition-transform duration-200 group-hover:scale-125"
+                          style={{ background: STATE_COLOR[plant.state] }}
+                        />
+                        <h4 className="display text-2xl text-white">{plant.name}</h4>
+                        <span className="text-sm text-paper-deep/70">{plant.state}</span>
                       </div>
-                      <p className="label-tag mt-3 text-oxide">{plant.type}</p>
-                      <p className="mt-3 max-w-[46ch] text-[0.9375rem] leading-relaxed text-ink-soft">
+                      <p className="label-tag mt-3 text-oxide-light">{plant.type}</p>
+                      <p className="mt-3 max-w-[46ch] text-[0.9375rem] leading-relaxed text-paper-deep/80">
                         {plant.body}
                       </p>
                     </li>
                   ))}
                 </ul>
-
-                <div className="open-item-anchor mt-6">
-                  <OpenSlot item={presence.plantsOpen} />
-                </div>
               </div>
             </div>
 
@@ -90,74 +114,14 @@ export function Presence() {
 
 /* ------------------------------------------------------------------ */
 
-function MapFrame({
-  selected,
-  onSelect,
-}: {
-  selected: string | null;
-  onSelect: (state: string | null) => void;
-}) {
-  return (
-    <div>
-      <p className="label-tag text-ink-muted">{presence.mapPrompt}</p>
-
-      <div className="mt-4 flex flex-wrap gap-1.5">
-        <FilterChip active={selected === null} onClick={() => onSelect(null)}>
-          {presence.allLabel}
-        </FilterChip>
-        {STATES.map((state) => (
-          <FilterChip key={state} active={selected === state} onClick={() => onSelect(state)}>
-            {state}
-          </FilterChip>
-        ))}
-      </div>
-
-      {/* Coordinate space for the real map. Markers are positioned as
-          percentages of this frame, so the licensed outline drops straight in. */}
-      <div className="art-slot open-item-anchor mt-6 aspect-[4/5]">
-        <div className="absolute inset-0 grid place-items-center p-6">
-          <div className="max-w-xs border border-rule-strong bg-paper/85 px-5 py-4 text-center backdrop-blur-sm">
-            <p className="label-tag text-oxide">Base map to be supplied</p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-              Boundary-accurate India outline, licensed or officially sourced. Not approximated
-              here on purpose.
-            </p>
-          </div>
-        </div>
-
-        {presence.plants.map((plant) => {
-          const isActive = selected === null || selected === plant.state;
-          return (
-            <span
-              key={plant.id}
-              className="absolute -translate-x-1/2 -translate-y-1/2 transition-opacity duration-300"
-              style={{
-                left: `${plant.position.x}%`,
-                top: `${plant.position.y}%`,
-                opacity: isActive ? 1 : 0.25,
-              }}
-            >
-              <span className="relative block h-3 w-3 rounded-full border-2 border-paper bg-oxide shadow-sm" />
-              <span className="label-tag absolute left-5 top-0 whitespace-nowrap text-ink">
-                {plant.name}
-              </span>
-            </span>
-          );
-        })}
-      </div>
-
-      <OpenSlot item={presence.mapOpen} />
-      <OpenSlot item={presence.dealerDataOpen} />
-    </div>
-  );
-}
-
 function FilterChip({
   active,
+  swatch,
   onClick,
   children,
 }: {
   active: boolean;
+  swatch?: string;
   onClick: () => void;
   children: React.ReactNode;
 }) {
@@ -166,12 +130,19 @@ function FilterChip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`label-tag cursor-pointer border px-3 py-2 transition-colors ${
+      className={`label-tag inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border px-4 transition-colors duration-200 ${
         active
-          ? "border-ink bg-ink text-paper"
-          : "border-rule-strong text-ink-muted hover:border-ink hover:text-ink"
+          ? "border-white bg-white text-ink"
+          : "border-white/35 text-paper-deep/80 hover:border-white hover:text-white"
       }`}
     >
+      {swatch ? (
+        <span
+          aria-hidden="true"
+          className="inline-block h-2 w-2 rounded-full"
+          style={{ background: swatch }}
+        />
+      ) : null}
       {children}
     </button>
   );
@@ -181,22 +152,24 @@ function FilterChip({
 
 function MobileLab() {
   return (
-    <div className="reveal mt-24 border-t-2 border-ink pt-12">
+    <div className="reveal mt-24 border-t border-white/25 pt-12">
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
         <div>
-          <h3 className="display max-w-[18ch] text-[length:var(--text-title)]">
+          <h3 className="display max-w-[18ch] text-[length:var(--text-title)] text-white">
             {presence.lab.heading}
           </h3>
-          <p className="prose-body mt-6 max-w-[54ch] text-[1rem]!">{presence.lab.body}</p>
+          <p className="prose-body mt-6 max-w-[54ch] text-[1rem]! text-paper-deep/80!">
+            {presence.lab.body}
+          </p>
         </div>
         <a
           href="#enquiry"
-          className="group inline-flex items-center gap-3 self-start border border-ink px-6 py-4 text-base transition-colors hover:bg-ink hover:text-paper lg:self-end"
+          className="group inline-flex min-h-14 items-center gap-3 self-start rounded-[var(--radius-md)] bg-white px-7 py-4 text-base font-semibold text-ink transition-all duration-200 hover:-translate-y-0.5 hover:bg-paper-deep hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.5)] lg:self-end"
         >
           {presence.lab.cta}
           <span
             aria-hidden="true"
-            className="transition-transform duration-300 group-hover:translate-x-1"
+            className="transition-transform duration-200 group-hover:translate-x-1"
           >
             →
           </span>
@@ -208,9 +181,11 @@ function MobileLab() {
 
 function DealerNote() {
   return (
-    <div className="reveal mt-16 bg-paper-deep p-8 md:p-10">
-      <h3 className="display text-3xl">{presence.dealer.heading}</h3>
-      <p className="prose-body mt-4 max-w-[58ch] text-[1rem]!">{presence.dealer.body}</p>
+    <div className="reveal mt-16 rounded-[var(--radius-md)] bg-ink-deep/70 p-8 transition-colors duration-300 hover:bg-ink-deep md:p-10">
+      <h3 className="display text-2xl text-white md:text-3xl">{presence.dealer.heading}</h3>
+      <p className="prose-body mt-4 max-w-[58ch] text-[1rem]! text-paper-deep/80!">
+        {presence.dealer.body}
+      </p>
     </div>
   );
 }

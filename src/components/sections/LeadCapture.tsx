@@ -3,7 +3,6 @@
 import { useId, useRef, useState } from "react";
 import { brand, leadCapture } from "@/content/copy";
 import { SectionLabel } from "@/components/ui/SectionHead";
-import { OpenSlot } from "@/components/ui/OpenSlot";
 import { validateEnquiry, type EnquiryInput, type FieldErrors } from "@/lib/validate";
 
 const EMPTY: EnquiryInput = { name: "", phone: "", email: "", project: "" };
@@ -76,7 +75,7 @@ export function LeadCapture() {
   const whatsappHref = `https://wa.me/91${leadCapture.whatsapp.number}`;
 
   return (
-    <section id="enquiry" aria-labelledby="enquiry-heading" className="border-t border-rule bg-paper-deep">
+    <section id="enquiry" aria-labelledby="enquiry-heading" className="bg-paper-deep">
       <div className="shell py-24 md:py-36">
         <div className="editorial">
           <SectionLabel index="06">{leadCapture.label}</SectionLabel>
@@ -93,8 +92,8 @@ export function LeadCapture() {
 
               {/* Not decoration. Cement brands in India are routinely
                   impersonated for advance-payment fraud. */}
-              <aside className="mt-12 border-l-2 border-oxide bg-paper py-5 pl-6 pr-5">
-                <h3 className="label-tag text-oxide">{leadCapture.trust.heading}</h3>
+              <aside className="mt-12 rounded-[var(--radius-md)] border-l-4 border-ink bg-paper py-5 pl-6 pr-5">
+                <h3 className="label-tag text-ink">{leadCapture.trust.heading}</h3>
                 <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-soft">
                   {leadCapture.trust.body}
                 </p>
@@ -104,7 +103,7 @@ export function LeadCapture() {
                 <span className="text-ink-muted">{leadCapture.whatsapp.prompt}</span>
                 <a
                   href={whatsappHref}
-                  className="text-ink underline decoration-oxide decoration-2 underline-offset-4 transition-colors hover:text-oxide"
+                  className="font-semibold text-ink underline decoration-oxide-light decoration-2 underline-offset-4 transition-colors hover:text-oxide"
                 >
                   {leadCapture.whatsapp.body}
                 </a>
@@ -165,7 +164,7 @@ export function LeadCapture() {
 
                   <div aria-live="assertive">
                     {status === "error" ? (
-                      <p className="border-l-2 border-oxide bg-oxide/8 py-3 pl-4 text-[0.9375rem] text-oxide-deep">
+                      <p className="rounded-[var(--radius-sm)] border-l-4 border-oxide bg-paper py-3 pl-4 text-[0.9375rem] text-ink">
                         {leadCapture.states.errorGeneral}
                       </p>
                     ) : null}
@@ -174,7 +173,7 @@ export function LeadCapture() {
                   <button
                     type="submit"
                     disabled={status === "submitting"}
-                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-4 bg-ink px-7 py-5 text-lg text-paper transition-colors hover:bg-oxide disabled:cursor-wait disabled:opacity-60 sm:w-auto"
+                    className="group inline-flex w-full cursor-pointer items-center justify-between gap-4 rounded-[var(--radius-md)] bg-ink px-7 py-5 text-lg font-semibold text-white transition-colors duration-200 hover:bg-ink-deep disabled:cursor-wait disabled:opacity-60 sm:w-auto"
                   >
                     {status === "submitting" ? leadCapture.submitting : leadCapture.submit}
                     <span
@@ -188,10 +187,6 @@ export function LeadCapture() {
                   <p className="max-w-[42ch] text-sm leading-relaxed text-ink-muted">
                     {leadCapture.privacy}
                   </p>
-
-                  <div className="open-item-anchor">
-                    <OpenSlot item={leadCapture.routingOpen} />
-                  </div>
                 </form>
               )}
             </div>
@@ -199,10 +194,16 @@ export function LeadCapture() {
         </div>
       </div>
 
-      <footer className="border-t border-rule">
+      <footer className="bg-ink-deep text-paper-deep">
         <div className="shell flex flex-wrap items-baseline justify-between gap-x-8 gap-y-4 py-12">
-          <p className="display max-w-[20ch] text-2xl md:text-3xl">{brand.signOff}</p>
-          <p className="label-tag text-ink-muted">{brand.eyebrow}</p>
+          <p className="display max-w-[20ch] text-2xl text-white md:text-3xl">{brand.signOff}</p>
+          <div className="text-right">
+            {/* Endorsement descriptor — replace this typeset line with the
+                supplied lockup asset; descriptors must not be set manually
+                in production. */}
+            <p className="label-tag text-white/70">Proudly delivered by Heidelberg Materials</p>
+            <p className="label-tag mt-2 text-white/40">{brand.eyebrow}</p>
+          </div>
         </div>
       </footer>
     </section>
@@ -256,13 +257,15 @@ function Field({
         onBlur={onBlur}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
-        className={`mt-3 w-full border-0 border-b bg-transparent pb-3 text-lg text-ink transition-colors placeholder:text-ink-faint focus:outline-none ${
-          error ? "border-b-2 border-oxide" : "border-b border-rule-strong focus:border-ink"
+        className={`mt-3 h-14 w-full rounded-[var(--radius-md)] border bg-paper px-4 text-lg text-ink-deep transition-colors placeholder:text-ink-faint/70 focus:outline-none ${
+          error
+            ? "border-2 border-oxide"
+            : "border-rule-strong focus:border-2 focus:border-ink"
         }`}
       />
       <div aria-live="polite">
         {error ? (
-          <p id={errorId} className="mt-2.5 text-sm text-oxide-deep">
+          <p id={errorId} className="mt-2.5 text-sm font-medium text-ink">
             {error}
           </p>
         ) : null}
@@ -273,12 +276,12 @@ function Field({
 
 function SuccessPanel({ onReset }: { onReset: () => void }) {
   return (
-    <div role="status" className="border-l-2 border-ink bg-paper p-8">
-      <p className="display text-3xl">{leadCapture.states.success}</p>
+    <div role="status" className="rounded-[var(--radius-md)] border-l-4 border-ink bg-paper p-8">
+      <p className="display text-3xl text-ink">{leadCapture.states.success}</p>
       <button
         type="button"
         onClick={onReset}
-        className="label-tag mt-8 cursor-pointer text-oxide underline underline-offset-4 transition-colors hover:text-ink"
+        className="label-tag mt-8 cursor-pointer text-ink-muted underline underline-offset-4 transition-colors hover:text-ink"
       >
         Send another enquiry
       </button>

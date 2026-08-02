@@ -28,12 +28,44 @@ npm run dev     # http://localhost:3000
   component holds copy of its own, so a deck revision is one file. Unresolved
   values are typed (`OpenItem`), not stringly — a missing figure is `null` and
   renders as an em-dash, never as a plausible-looking number.
-- **`src/app/globals.css` holds the design tokens.** Warm paper, ink, hairline
-  rules, and iron oxide as the accent — the pigment that is actually in the
-  material. Two type families: Instrument Serif for display, Archivo for
-  everything else.
-- **Placeholder art is deliberately unglamorous** — correct aspect ratios,
-  stamped "to be supplied", impossible to mistake for finished art in a review.
+- **`src/app/globals.css` holds the design tokens.** The Heidelberg Materials
+  brand system per `DESIGN_INSTRUCTIONS`: Deep Green `#004E2B` and Sandy Grey
+  `#E6E6DF` (exact, from the guide), derived tints for UI depth, weather-state
+  colours confined to the hero HUD. Plus Jakarta Sans for display and body
+  (a visually-matched stand-in — the guide has no type page), JetBrains Mono
+  for eyebrows, labels and stat units only.
+- **Motion:** Lenis smooth scroll + a scroll-driven pinned weather hero
+  (mask wipes with per-transition direction, particle canvas where effects
+  lead the image). Below 768px the hero is a swipeable carousel — no
+  scroll-jacking on mobile. Under `prefers-reduced-motion` Lenis is never
+  started and the hero renders statically.
+
+## Assets
+
+| Location | State |
+|---|---|
+| `public/hero/` | **Real.** AVIF + WebP at 1080 / 1600 / 2560 / 3840, cut from the supplied 5504×3072 masters with identical encoder settings per frame, so no texture variation shows during crossfades. |
+| `hero-masters/` | The four 5504×3072 originals. Kept outside `public/` — Next copies `public/` verbatim, and serving 36MB of unused masters would wreck the budget. Re-cut from here. |
+| `public/brand/logo.png` | **Real.** HeidelbergCement India, positive colourway, transparent PNG. |
+| `public/products/` | **Placeholder.** AI bag renders on white, pending supplied photography. Same filenames swap straight in. |
+
+To re-cut the hero derivatives after replacing a master, use `sharp` (already
+present as a Next dependency) at widths 1080/1600/2560/3840, AVIF q52 + WebP
+q80 — that lands each 2560 frame at roughly 230–340KB AVIF.
+
+### Two brand notes on the logo
+
+Both are decisions for the client, not blockers:
+
+1. **The box is White, not Deep Green.** The supplied asset is the positive
+   (green) colourway, which would be invisible on Deep Green, and recolouring
+   the mark is not permitted. White is one of the four approved box colours.
+   If the mono white colourway is supplied, the box can move to Deep Green —
+   it is one class name in `Hero.tsx`.
+2. **It is the full lockup and reads "HeidelbergCement India".** The guide
+   specifies the *compact* logo, and the group now trades as Heidelberg
+   Materials. Worth confirming which mark and wordmark this concept should
+   carry before it is shown.
 
 ## Review mode
 
